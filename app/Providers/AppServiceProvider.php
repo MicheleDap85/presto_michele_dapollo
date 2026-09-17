@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\Category;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +22,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        try {
+            if (Schema::hasTable('categories')) {
+                View::share('categories', Category::orderBy('name')->get());
+            }
+        } catch (\Throwable $exception) {
+            // The database may not be available yet during install or test bootstrap.
+        }
     }
 }

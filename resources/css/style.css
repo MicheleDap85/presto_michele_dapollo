@@ -1,0 +1,66 @@
+:root {
+    --presto-teal: #0f766e;
+    --presto-teal-dark: #115e59;
+    --presto-sand: #f4f1ea;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--presto-sand);
+    color: #1f2937;
+}
+
+.min-h-custom,
+.height-custom {
+    min-height: 70vh;
+}
+
+.navbar-presto {
+    background-color: var(--presto-teal);
+}
+
+.navbar-presto .navbar-brand,
+.navbar-presto .nav-link,
+.navbar-presto .navbar-toggler {
+    color: #fff;
+}
+
+.navbar-presto .nav-link:hover,
+.navbar-presto .nav-link.active {
+    color: #ccfbf1;
+}
+
+.btn-presto {
+    background-color: var(--presto-teal);
+    border-color: var(--presto-teal);
+    color: #fff;
+}
+
+.btn-presto:hover,
+.btn-presto:focus {
+    background-color: var(--presto-teal-dark);
+    border-color: var(--presto-teal-dark);
+    color: #fff;
+}
+
+.hero-presto {
+    background: linear-gradient(135deg, #0f766e 0%, #0d9488 55%, #f59e0b 140%);
+    color: #fff;
+    border-radius: 1.25rem;
+}
+
+.category-pill {
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 999px;
+    padding: 0.4rem 0.9rem;
+    font-size: 0.9rem;
+}
+
+.footer-presto {
+    margin-top: auto;
+    background-color: #111827;
+    color: #d1d5db;
+}

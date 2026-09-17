@@ -21,6 +21,9 @@
 /storage/*.key
 /storage/pail
 /vendor
+/database/*.sqlite
+/database/*.sqlite-journal
+/presto_michele_dapollo
 _ide_helper.php
 Homestead.json
 Homestead.yaml
