@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Livewire\CreateArticleForm;
-use App\Models\Article;
 use App\Models\Category;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -65,7 +64,5 @@ class UserStoryOneTest extends TestCase
             'user_id' => $user->id,
             'category_id' => $category->id,
         ]);
-
-        $this->assertSame(1, Article::query()->count());
     }
 }

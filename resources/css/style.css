@@ -64,3 +64,50 @@ body {
     background-color: #111827;
     color: #d1d5db;
 }
+
+.card-w {
+    max-width: 22rem;
+}
+
+.card-w .card-img-top {
+    height: 300px;
+    object-fit: cover;
+}
+
+.article-carousel-image {
+    height: 300px;
+    object-fit: cover;
+}
+
+.revisor-placeholder {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+}
+
+.vision-rating [class*="bi-"]::before {
+    font-size: 1.35rem;
+}
+
+.locale-flag {
+    line-height: 1;
+    border: 2px solid transparent;
+}
+
+.locale-flag img {
+    display: block;
+    border-radius: 3px;
+}
+
+.locale-flag.is-active {
+    border-color: #ccfbf1;
+    border-radius: 6px;
+}
+
+.img-preview {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 120px;
+    width: 120px;
+}

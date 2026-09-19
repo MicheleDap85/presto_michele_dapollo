@@ -1,14 +1,14 @@
-<x-layout title="Registrati - PRESTO">
+<x-layout title="{{ __('ui.register') }} - PRESTO">
     <div class="container py-5">
         <div class="row justify-content-center height-custom align-items-center">
             <div class="col-12 col-md-6 col-lg-5">
-                <h1 class="h3 mb-4 text-center">Crea il tuo account</h1>
+                <h1 class="h3 mb-4 text-center">{{ __('ui.registerTitle') }}</h1>
 
                 <form method="POST" action="{{ route('register') }}">
                     @csrf
 
                     <div class="mb-3">
-                        <label for="name" class="form-label">Nome</label>
+                        <label for="name" class="form-label">{{ __('ui.name') }}</label>
                         <input type="text" name="name" id="name" value="{{ old('name') }}"
                                class="form-control @error('name') is-invalid @enderror" required>
                         @error('name')
@@ -17,7 +17,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="email" class="form-label">Indirizzo email</label>
+                        <label for="email" class="form-label">{{ __('ui.email') }}</label>
                         <input type="email" name="email" id="email" value="{{ old('email') }}"
                                class="form-control @error('email') is-invalid @enderror" required>
                         @error('email')
@@ -26,7 +26,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
+                        <label for="password" class="form-label">{{ __('ui.password') }}</label>
                         <input type="password" name="password" id="password"
                                class="form-control @error('password') is-invalid @enderror" required>
                         @error('password')
@@ -35,16 +35,16 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="password_confirmation" class="form-label">Conferma la tua password</label>
+                        <label for="password_confirmation" class="form-label">{{ __('ui.confirmPassword') }}</label>
                         <input type="password" name="password_confirmation" id="password_confirmation"
                                class="form-control" required>
                     </div>
 
-                    <button type="submit" class="btn btn-presto w-100">Registrati</button>
+                    <button type="submit" class="btn btn-presto w-100">{{ __('ui.register') }}</button>
                 </form>
 
                 <p class="text-center mt-3 mb-0">
-                    Hai già un account? <a href="{{ route('login') }}">Login</a>
+                    {{ __('ui.hasAccount') }} <a href="{{ route('login') }}">{{ __('ui.login') }}</a>
                 </p>
             </div>
         </div>

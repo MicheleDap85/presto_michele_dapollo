@@ -2,14 +2,22 @@
 
 namespace App\Livewire;
 
+use App\Jobs\GoogleVisionLabelImage;
+use App\Jobs\GoogleVisionSafeSearch;
+use App\Jobs\RemoveFaces;
+use App\Jobs\ResizeImage;
 use App\Models\Article;
 use App\Models\Category;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class CreateArticleForm extends Component
 {
+    use WithFileUploads;
+
     #[Validate('required|min:5')]
     public $title;
 
@@ -24,20 +32,48 @@ class CreateArticleForm extends Component
 
     public $article;
 
+    public $images = [];
+
+    public $temporary_images;
+
     /**
      * @return array<string, string>
      */
     public function messages(): array
     {
         return [
-            'title.required' => 'Il titolo è obbligatorio.',
-            'title.min' => 'Il titolo deve avere almeno :min caratteri.',
-            'description.required' => 'La descrizione è obbligatoria.',
-            'description.min' => 'La descrizione deve avere almeno :min caratteri.',
-            'price.required' => 'Il prezzo è obbligatorio.',
-            'price.numeric' => 'Il prezzo deve essere un numero.',
-            'category.required' => 'La categoria è obbligatoria.',
+            'title.required' => __('ui.titleRequired'),
+            'title.min' => __('ui.titleMin'),
+            'description.required' => __('ui.descriptionRequired'),
+            'description.min' => __('ui.descriptionMin'),
+            'price.required' => __('ui.priceRequired'),
+            'price.numeric' => __('ui.priceNumeric'),
+            'category.required' => __('ui.categoryRequired'),
+            'temporary_images.max' => __('ui.imagesMax'),
+            'temporary_images.*.image' => __('ui.imageType'),
+            'temporary_images.*.max' => __('ui.imageMax'),
         ];
+    }
+
+    public function updatedTemporaryImages(): void
+    {
+        if ($this->validate([
+            'temporary_images.*' => 'image|max:1024',
+            'temporary_images' => 'max:6',
+        ])) {
+            foreach ($this->temporary_images as $image) {
+                $this->images[] = $image;
+            }
+        }
+    }
+
+    public function removeImage(int|string $key): void
+    {
+        if (in_array($key, array_keys($this->images))) {
+            $images = $this->images;
+            unset($images[$key]);
+            $this->images = $images;
+        }
     }
 
     public function store(): void
@@ -52,9 +88,31 @@ class CreateArticleForm extends Component
             'user_id' => Auth::id(),
         ]);
 
-        session()->flash('success', 'Annuncio inserito correttamente.');
+        if (count($this->images) > 0) {
+            foreach ($this->images as $image) {
+                $newFileName = "articles/{$this->article->id}";
+                $newImage = $this->article->images()->create(['path' => $image->store($newFileName, 'public')]);
+                RemoveFaces::withChain([
+                    new ResizeImage($newImage->path, 300, 300),
+                    new GoogleVisionSafeSearch($newImage->id),
+                    new GoogleVisionLabelImage($newImage->id),
+                ])->dispatch($newImage->id);
+            }
+            File::deleteDirectory(storage_path('/app/livewire-tmp'));
+        }
 
-        $this->reset();
+        session()->flash('success', __('ui.articleCreated'));
+        $this->cleanForm();
+    }
+
+    protected function cleanForm(): void
+    {
+        $this->title = '';
+        $this->description = '';
+        $this->category = '';
+        $this->price = '';
+        $this->images = [];
+        $this->temporary_images = [];
     }
 
     public function render()

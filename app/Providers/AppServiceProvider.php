@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Category;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -22,12 +23,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        try {
-            if (Schema::hasTable('categories')) {
-                View::share('categories', Category::orderBy('name')->get());
+        Paginator::useBootstrapFive();
+
+        View::composer(['components.navbar', 'welcome'], function ($view): void {
+            try {
+                if (Schema::hasTable('categories')) {
+                    $view->with('categories', Category::query()->orderBy('name')->get());
+                }
+            } catch (\Throwable $exception) {
+                // The database may not be available yet during install or test bootstrap.
             }
-        } catch (\Throwable $exception) {
-            // The database may not be available yet during install or test bootstrap.
-        }
+        });
     }
 }

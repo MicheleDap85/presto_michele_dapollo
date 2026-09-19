@@ -1,4 +1,4 @@
-<x-layout title="Inserisci annuncio - PRESTO">
+<x-layout title="{{ __('ui.insertAd') }} - PRESTO">
     <div class="container py-5">
         <livewire:create-article-form />
     </div>
