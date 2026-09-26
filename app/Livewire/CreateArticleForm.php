@@ -8,10 +8,11 @@ use App\Jobs\RemoveFaces;
 use App\Jobs\ResizeImage;
 use App\Models\Article;
 use App\Models\Category;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\File;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
+use Livewire\Features\SupportFileUploads\FileUploadConfiguration;
 use Livewire\WithFileUploads;
 
 class CreateArticleForm extends Component
@@ -19,22 +20,22 @@ class CreateArticleForm extends Component
     use WithFileUploads;
 
     #[Validate('required|min:5')]
-    public $title;
+    public $title = '';
 
     #[Validate('required|min:10')]
-    public $description;
+    public $description = '';
 
     #[Validate('required|numeric')]
-    public $price;
+    public $price = '';
 
     #[Validate('required')]
-    public $category;
+    public $category = '';
 
     public $article;
 
     public $images = [];
 
-    public $temporary_images;
+    public $temporary_images = [];
 
     /**
      * @return array<string, string>
@@ -61,9 +62,13 @@ class CreateArticleForm extends Component
             'temporary_images.*' => 'image|max:1024',
             'temporary_images' => 'max:6',
         ])) {
+            $images = is_array($this->images) ? $this->images : [];
+
             foreach ($this->temporary_images as $image) {
-                $this->images[] = $image;
+                $images[] = $image;
             }
+
+            $this->images = $images;
         }
     }
 
@@ -88,8 +93,10 @@ class CreateArticleForm extends Component
             'user_id' => Auth::id(),
         ]);
 
-        if (count($this->images) > 0) {
-            foreach ($this->images as $image) {
+        $uploadedImages = $this->uploadedImages();
+
+        if ($uploadedImages !== []) {
+            foreach ($uploadedImages as $image) {
                 $newFileName = "articles/{$this->article->id}";
                 $newImage = $this->article->images()->create(['path' => $image->store($newFileName, 'public')]);
                 RemoveFaces::withChain([
@@ -98,11 +105,46 @@ class CreateArticleForm extends Component
                     new GoogleVisionLabelImage($newImage->id),
                 ])->dispatch($newImage->id);
             }
-            File::deleteDirectory(storage_path('/app/livewire-tmp'));
+
+            FileUploadConfiguration::storage()->deleteDirectory(FileUploadConfiguration::directory());
         }
 
         session()->flash('success', __('ui.articleCreated'));
         $this->cleanForm();
+    }
+
+    /**
+     * @return list<UploadedFile>
+     */
+    protected function uploadedImages(): array
+    {
+        $previewImages = $this->filesFrom($this->images);
+
+        if ($previewImages !== []) {
+            return $previewImages;
+        }
+
+        return $this->filesFrom($this->temporary_images);
+    }
+
+    /**
+     * @return list<UploadedFile>
+     */
+    protected function filesFrom(mixed $group): array
+    {
+        if (! is_array($group)) {
+            return [];
+        }
+
+        $files = [];
+
+        foreach ($group as $image) {
+            if ($image instanceof UploadedFile) {
+                $files[] = $image;
+            }
+        }
+
+        return $files;
     }
 
     protected function cleanForm(): void
@@ -118,7 +160,7 @@ class CreateArticleForm extends Component
     public function render()
     {
         return view('livewire.create-article-form', [
-            'categories' => Category::orderBy('name')->get(),
+            'categories' => Category::query()->orderBy('name')->get(),
         ]);
     }
 }

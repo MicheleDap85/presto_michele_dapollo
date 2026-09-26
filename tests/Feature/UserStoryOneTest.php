@@ -41,6 +41,25 @@ class UserStoryOneTest extends TestCase
         ])->assertRedirect('/create');
 
         $this->assertAuthenticated();
+        $this->assertDatabaseHas('users', [
+            'email' => 'linda@example.com',
+        ]);
+
+        $this->get(route('article.create'))
+            ->assertOk()
+            ->assertSee('Inserisci un annuncio');
+    }
+
+    public function test_authenticated_user_can_view_create_article_page(): void
+    {
+        $this->seed();
+
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->get(route('article.create'))
+            ->assertOk()
+            ->assertSee('Inserisci un annuncio');
     }
 
     public function test_authenticated_user_can_create_an_article(): void

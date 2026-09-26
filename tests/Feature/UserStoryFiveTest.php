@@ -104,6 +104,37 @@ class UserStoryFiveTest extends TestCase
         Storage::disk('public')->assertExists($article->images->first()->path);
     }
 
+    public function test_store_attaches_images_from_the_temporary_upload_when_the_preview_collection_is_empty(): void
+    {
+        Queue::fake([
+            RemoveFaces::class,
+            ResizeImage::class,
+            GoogleVisionSafeSearch::class,
+            GoogleVisionLabelImage::class,
+        ]);
+        Storage::fake('public');
+        $this->seed();
+
+        $user = User::factory()->create();
+        $category = Category::query()->firstOrFail();
+
+        Livewire::actingAs($user)
+            ->test(CreateArticleForm::class)
+            ->set('title', 'Bici da corsa')
+            ->set('description', 'Bici in ottimo stato, usata poco.')
+            ->set('price', 150)
+            ->set('category', $category->id)
+            ->set('temporary_images', [UploadedFile::fake()->image('bici.jpg')])
+            ->set('images', [])
+            ->call('store')
+            ->assertHasNoErrors();
+
+        $article = Article::query()->where('title', 'Bici da corsa')->firstOrFail();
+
+        $this->assertSame(1, $article->images()->count());
+        Storage::disk('public')->assertExists($article->images->first()->path);
+    }
+
     public function test_more_than_six_images_are_rejected(): void
     {
         Storage::fake('public');

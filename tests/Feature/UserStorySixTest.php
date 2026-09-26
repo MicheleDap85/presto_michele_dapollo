@@ -111,6 +111,18 @@ class UserStorySixTest extends TestCase
         $this->assertSame(Storage::url('articles/12/lampada.jpg'), $image->getUrl());
     }
 
+    public function test_image_url_falls_back_to_the_original_when_the_crop_is_missing(): void
+    {
+        Storage::fake('public');
+        Storage::disk('public')->put('articles/12/lampada.jpg', 'photo');
+
+        $image = Image::factory()->make([
+            'path' => 'articles/12/lampada.jpg',
+        ]);
+
+        $this->assertSame(Storage::url('articles/12/lampada.jpg'), $image->getUrl(300, 300));
+    }
+
     public function test_article_card_and_detail_use_the_cropped_image_url(): void
     {
         $this->seed();

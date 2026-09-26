@@ -41,7 +41,7 @@ return [
     'category' => 'Categoria',
     'selectCategory' => 'Seleziona una categoria',
     'publishAd' => 'Pubblica annuncio',
-    'articleCreated' => 'Annuncio inserito correttamente.',
+    'articleCreated' => 'Annuncio inserito. Sarà visibile in home e in elenco dopo l\'approvazione di un revisore.',
     'titleRequired' => 'Il titolo è obbligatorio.',
     'titleMin' => 'Il titolo deve avere almeno :min caratteri.',
     'descriptionRequired' => 'La descrizione è obbligatoria.',

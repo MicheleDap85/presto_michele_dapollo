@@ -41,7 +41,7 @@ return [
     'category' => 'Category',
     'selectCategory' => 'Select a category',
     'publishAd' => 'Publish ad',
-    'articleCreated' => 'Ad posted successfully.',
+    'articleCreated' => 'Ad submitted. It will appear on the homepage and listings after a revisor approves it.',
     'titleRequired' => 'The title is required.',
     'titleMin' => 'The title must be at least :min characters.',
     'descriptionRequired' => 'The description is required.',

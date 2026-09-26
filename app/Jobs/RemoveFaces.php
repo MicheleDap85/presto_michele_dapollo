@@ -6,6 +6,7 @@ use App\Models\Image;
 use Google\Cloud\Vision\V1\AnnotateImageRequest;
 use Google\Cloud\Vision\V1\BatchAnnotateImagesRequest;
 use Google\Cloud\Vision\V1\Client\ImageAnnotatorClient;
+use Google\Cloud\Vision\V1\FaceAnnotation;
 use Google\Cloud\Vision\V1\Feature;
 use Google\Cloud\Vision\V1\Feature\Type;
 use Google\Cloud\Vision\V1\Image as VisionImage;
@@ -45,8 +46,13 @@ class RemoveFaces implements ShouldQueue
             return;
         }
 
+        $credentials = base_path('google_credential.json');
+        if (! is_file($credentials)) {
+            return;
+        }
+
         $image = file_get_contents($src);
-        putenv('GOOGLE_APPLICATION_CREDENTIALS='.base_path('google_credential.json'));
+        putenv('GOOGLE_APPLICATION_CREDENTIALS='.$credentials);
 
         $googleVisionClient = new ImageAnnotatorClient;
         $google_image = new VisionImage([
@@ -74,7 +80,7 @@ class RemoveFaces implements ShouldQueue
     /**
      * Overlay the censorship image on each detected face.
      *
-     * @param  iterable<int, \Google\Cloud\Vision\V1\FaceAnnotation>  $faces
+     * @param  iterable<int, FaceAnnotation>  $faces
      */
     public function applyFaceCensor(string $src, iterable $faces): void
     {

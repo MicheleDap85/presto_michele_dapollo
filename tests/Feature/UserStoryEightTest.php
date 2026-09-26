@@ -108,6 +108,31 @@ class UserStoryEightTest extends TestCase
         $this->assertSame(0, Image::query()->count());
     }
 
+    public function test_remove_faces_skips_google_when_credentials_are_missing(): void
+    {
+        if (is_file(base_path('google_credential.json'))) {
+            $this->markTestSkipped('Google Vision credentials are present.');
+        }
+
+        $folder = 'articles/us8-'.uniqid();
+        $relativePath = $folder.'/photo.jpg';
+        $sourcePath = storage_path('app/public/'.$relativePath);
+
+        File::ensureDirectoryExists(dirname($sourcePath));
+        file_put_contents($sourcePath, 'photo');
+
+        $image = Image::factory()->create(['path' => $relativePath]);
+
+        try {
+            (new RemoveFaces($image->id))->handle();
+
+            $this->assertFileExists($sourcePath);
+            $this->assertSame('photo', file_get_contents($sourcePath));
+        } finally {
+            File::deleteDirectory(storage_path('app/public/'.$folder));
+        }
+    }
+
     public function test_censor_image_is_stored_in_resources(): void
     {
         $this->assertFileExists(base_path('resources/img/face.png'));
